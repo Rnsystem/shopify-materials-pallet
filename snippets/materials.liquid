@@ -1,0 +1,65 @@
+{% comment %}
+  snippets/materials.liquid
+  商品ページで任意に追加できる「使用している木材」セクション
+{% endcomment %}
+
+
+{% if product and product.metafields.custom.primary_material != blank %}
+    {{ 'materials.css' | asset_url | stylesheet_tag }}
+
+    <collapsible-section class="wt-collapse wt-collapse--always  scroll-trigger animate--slide-in   disabled-on-mobile " data-toggle-tabindex="button, [href], input, select" data-open="false">
+        <div class="wt-collapse__trigger" role="button" tabindex="0" data-open="false" aria-expanded="false" aria-controls="CollapsibleTab-d162f900-ee92-4311-b27d-d5f312fa73f2">
+            <div class="wt-collapse__trigger__text">
+                <span class="wt-collapse__trigger__title">{{ block.settings.title }}</span>
+            </div>
+            <div class="wt-icon" aria-hidden="true">
+                <svg class="svg-icon svg-icon--plus " aria-hidden="true" id="" focusable="false" role="presentation" xmlns="http://www.w3.org/2000/svg" data-icon-theme="option_1" width="72" height="72" viewBox="0 0 72 72">                    <title></title>                <g id="Plus">                <rect class="icon-plus-y" width="54" height="4" rx="2" y="34" x="9"></rect>                <rect class="icon-plus-x" width="4" height="54" rx="2" y="9" x="34"></rect>            </g>        </svg>                                                        
+            </div>
+        </div>
+        <div class="wt-collapse__target" id="CollapsibleTab-d162f900-ee92-4311-b27d-d5f312fa73f2">
+            <div class="wt-collapse__target--text" data-block-id-for-variant-metafield="d162f900-ee92-4311-b27d-d5f312fa73f2">
+                <div class="wt-collapse__target__content rte">
+                    <section id="materials-{{ section.id }}" class="materials-section">
+                        <div class="accordion">
+                            <div class="accordion__panel" data-acc-panel>
+                                {% if block.settings.desc != blank %}
+                                    <p>{{ block.settings.desc }}</p>
+                                {% endif %}
+                                <div class="metaobject__table">
+                                    <div class="table__grid-container" data-grid>
+                                        {% for my_metaobject in shop.metaobjects.primary_material.values %}
+                                            <div class="grid_item">{{ my_metaobject.material }}</div>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                                {% if block.settings.note != blank %}
+                                    <p>{{ block.settings.note }}</p>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <script>
+                            document.addEventListener("DOMContentLoaded", function () {
+                            // メタフィールド（_material）から選択項目を抽出してハイライト
+                            try {
+                                var selectedItemsObject = {{ product.metafields.custom.primary_material.value | json }};
+                                var selectedItems = Object.values(selectedItemsObject).map(function(material) {
+                                    return (material && material.material) ? String(material.material).trim() : "";
+                                }).filter(Boolean);
+                                var gridItems = root.querySelectorAll("[data-grid] .grid_item");
+                                gridItems.forEach(function(item) {
+                                    var current = item.textContent.trim();
+                                    if (selectedItems.includes(current)) {
+                                        item.classList.add("highlight");
+                                    }
+                                });
+                            } catch (e) {
+                                console.warn("materials section parse error:", e);
+                            }
+                            });
+                        </script>
+                    </section>
+                </div>
+            </div>
+        </div>
+    </collapsible-section>
+{% endif %}
